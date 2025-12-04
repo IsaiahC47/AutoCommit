@@ -105,9 +105,9 @@ launchctl unload ~/Library/LaunchAgents/<plist_name>.plist
 
 ### View Logs
 
-Logs are automatically created in the AutoCommit directory:
-- `commit_<folder>_<timestamp>.log` - Standard output
-- `commit_<folder>_<timestamp>_error.log` - Error output
+Logs are automatically created in the `logs/` folder within the AutoCommit directory:
+- `logs/commit_<folder>_<timestamp>.log` - Standard output
+- `logs/commit_<folder>_<timestamp>_error.log` - Error output
 
 ## Features
 
@@ -125,6 +125,7 @@ Logs are automatically created in the AutoCommit directory:
 AutoCommit/
 ├── schedule_git_commit.py    # Main interactive scheduling script
 ├── git_commit_executor.py    # Executor script called by launchd
+├── logs/                     # Directory containing commit logs
 └── README.md                 # This file
 ```
 

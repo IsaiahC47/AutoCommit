@@ -155,10 +155,27 @@ def create_launchd_plist(folder_path, repo_path, target_datetime, script_path):
     # Create a unique label based on folder and timestamp
     label = f"com.gitcommit.{folder_name.lower().replace(' ', '').replace('-', '')}.{target_datetime.strftime('%Y%m%d%H%M')}"
     
+    # Find the actual python3 path
+    try:
+        python3_path = subprocess.check_output(["which", "python3"], text=True).strip()
+    except subprocess.CalledProcessError:
+        # Fallback to common paths
+        python3_path = "/usr/bin/python3"
+    
+    # Ensure all paths are absolute
+    script_path = os.path.abspath(script_path)
+    folder_path = os.path.abspath(folder_path)
+    repo_path = os.path.abspath(repo_path)
+    script_dir = os.path.dirname(script_path)
+    
+    # Create logs directory if it doesn't exist
+    logs_dir = os.path.join(script_dir, "logs")
+    os.makedirs(logs_dir, exist_ok=True)
+    
     plist_data = {
         "Label": label,
         "ProgramArguments": [
-            "/usr/bin/python3",
+            python3_path,
             script_path,
             folder_path,
             repo_path
@@ -169,8 +186,8 @@ def create_launchd_plist(folder_path, repo_path, target_datetime, script_path):
             "Hour": target_datetime.hour,
             "Minute": target_datetime.minute
         },
-        "StandardOutPath": f"{os.path.dirname(script_path)}/commit_{folder_name}_{target_datetime.strftime('%Y%m%d_%H%M')}.log",
-        "StandardErrorPath": f"{os.path.dirname(script_path)}/commit_{folder_name}_{target_datetime.strftime('%Y%m%d_%H%M')}_error.log",
+        "StandardOutPath": os.path.join(logs_dir, f"commit_{folder_name}_{target_datetime.strftime('%Y%m%d_%H%M')}.log"),
+        "StandardErrorPath": os.path.join(logs_dir, f"commit_{folder_name}_{target_datetime.strftime('%Y%m%d_%H%M')}_error.log"),
         "RunAtLoad": False
     }
     
